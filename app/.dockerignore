@@ -1,0 +1,4 @@
+var/www/storage
+var/www/cache
+var/www/runtime
+var/www/vendor

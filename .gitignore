@@ -1,0 +1,5 @@
+.env
+.idea/
+
+docker/app/var/www/.composer/
+docker/mysql/var/lib/mysql/

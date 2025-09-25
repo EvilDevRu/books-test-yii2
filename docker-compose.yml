@@ -1,0 +1,51 @@
+version: "3"
+services:
+  mysql-test:
+    build:
+      context: ./docker/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: db
+    volumes:
+      - ./docker/mysql/var/lib/mysql/data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      self_test:
+        ipv4_address: ${NETWORK_MYSQL}
+
+  app-test:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        APP_RUN_ID: ${APP_RUN_ID}
+        APP_RUN_USER: ${APP_RUN_USER}
+        APP_RUN_GROUP: ${APP_RUN_GROUP}
+    volumes:
+      - ./app/var/www:/var/www/
+      - ./app/tmp:/tmp
+    restart: unless-stopped
+    depends_on:
+      - mysql-test
+    networks:
+      self_test:
+        ipv4_address: ${NETWORK_APP}
+
+  nginx-test:
+    build:
+      context: ./docker/nginx
+    depends_on:
+      - app-test
+    volumes:
+      - ./app/var/www/:/var/www/
+    restart: unless-stopped
+    networks:
+      self_test:
+        ipv4_address: ${NETWORK_NGINX}
+
+networks:
+  self_test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}
