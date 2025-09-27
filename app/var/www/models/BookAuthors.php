@@ -2,80 +2,72 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "books".
+ * This is the model class for table "book_author".
  *
  * @property int $id
- * @property string $title
- * @property int $year
- * @property string|null $description
- * @property string $isbn
- * @property string $photo
+ * @property int $book_id
+ * @property int $author_id
  *
- * @property Author[] $authors
- * @property BookAuthors[] $bookAuthors
+ * @property Author $author
+ * @property Book $book
  */
-class BookAuthors extends \yii\db\ActiveRecord
+class BookAuthors extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'books';
+        return '{{%book_author}}';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['description'], 'default', 'value' => null],
-            [['title', 'year', 'isbn', 'photo'], 'required'],
-            [['year'], 'integer'],
-            [['description'], 'string'],
-            [['title', 'isbn', 'photo'], 'string', 'max' => 255],
+            [['book_id', 'author_id'], 'required'],
+            [['book_id', 'author_id'], 'integer'],
+            [['book_id'], 'exist', 'skipOnError' => true, 'targetClass' => Book::class, 'targetAttribute' => ['book_id' => 'id']],
+            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Author::class, 'targetAttribute' => ['author_id' => 'id']],
+            [['book_id', 'author_id'], 'unique', 'targetAttribute' => ['book_id', 'author_id']],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'year' => 'Year',
-            'description' => 'Description',
-            'isbn' => 'Isbn',
-            'photo' => 'Photo',
+            'book_id' => 'Книга',
+            'author_id' => 'Автор',
         ];
     }
 
     /**
-     * Gets query for [[Authors]].
+     * Gets query for [[Author]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getAuthors()
+    public function getAuthorRelation(): ActiveQuery
     {
-        return $this->hasMany(Author::class, ['id' => 'author_id'])->viaTable('book_author', ['book_id' => 'id']);
+        return $this->hasOne(Author::class, ['id' => 'author_id']);
     }
 
     /**
-     * Gets query for [[BookAuthors]].
+     * Gets query for [[Book]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getBookAuthors()
+    public function getBookRelation(): ActiveQuery
     {
-        return $this->hasMany(BookAuthors::class, ['book_id' => 'id']);
+        return $this->hasOne(Book::class, ['id' => 'book_id']);
     }
-
 }

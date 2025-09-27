@@ -2,57 +2,61 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "authors".
  *
  * @property int $id
  * @property string $name
+ * @property int|null $birth_year
+ * @property string|null $biography
  *
  * @property BookAuthors[] $bookAuthors
  * @property Book[] $books
  */
-class Author extends \yii\db\ActiveRecord
+class Author extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'authors';
+        return '{{%authors}}';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
+            [['name'], 'unique'],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Имя автора',
+            'birth_year' => 'Год рождения',
+            'biography' => 'Биография',
         ];
     }
 
     /**
      * Gets query for [[BookAuthors]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getBookAuthors()
+    public function getBookAuthorsRelation(): ActiveQuery
     {
         return $this->hasMany(BookAuthors::class, ['author_id' => 'id']);
     }
@@ -60,11 +64,37 @@ class Author extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Books]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getBooks()
+    public function getBooksRelation(): ActiveQuery
     {
-        return $this->hasMany(Book::class, ['id' => 'book_id'])->viaTable('book_author', ['author_id' => 'id']);
+        return $this->hasMany(Book::class, ['id' => 'book_id'])
+            ->via('bookAuthors');
     }
 
+    /**
+     * Получает список авторов для dropdown
+     * @return array
+     */
+    public static function getList(): array
+    {
+        return static::find()
+            ->select(['name'])
+            ->indexBy('id')
+            ->orderBy('name')
+            ->column();
+    }
+
+    /**
+     * Получает строку с книгами автора
+     * @return string
+     */
+    public function getBooksString(): string
+    {
+        $books = [];
+        foreach ($this->books as $book) {
+            $books[] = $book->title;
+        }
+        return implode(', ', $books);
+    }
 }

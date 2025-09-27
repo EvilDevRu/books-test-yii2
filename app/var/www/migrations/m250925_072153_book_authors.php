@@ -9,7 +9,7 @@ class m250925_072153_book_authors extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('book_author', [
+        $this->createTable('{{%book_author}}', [
             'id' => $this->primaryKey(),
             'book_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
@@ -17,9 +17,9 @@ class m250925_072153_book_authors extends Migration
 
         $this->addForeignKey(
             'fk-book_author-book_id',
-            'book_author',
+            '{{%book_author}}',
             'book_id',
-            'books',
+            '{{%books}}',
             'id',
             'CASCADE',
             'CASCADE'
@@ -27,9 +27,9 @@ class m250925_072153_book_authors extends Migration
 
         $this->addForeignKey(
             'fk-book_author-author_id',
-            'book_author',
+            '{{%book_author}}',
             'author_id',
-            'authors',
+            '{{%authors}}',
             'id',
             'CASCADE',
             'CASCADE'
@@ -38,7 +38,7 @@ class m250925_072153_book_authors extends Migration
         // Добавляем уникальный индекс для предотвращения дублирования связей
         $this->createIndex(
             'idx-book_author-unique',
-            'book_author',
+            '{{%book_author}}',
             ['book_id', 'author_id'],
             true
         );
@@ -49,9 +49,9 @@ class m250925_072153_book_authors extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('fk-book_author-book_id', 'book_author');
-        $this->dropForeignKey('fk-book_author-author_id', 'book_author');
+        $this->dropForeignKey('fk-book_author-book_id', '{{%book_author}}');
+        $this->dropForeignKey('fk-book_author-author_id', '{{%book_author}}');
 
-        $this->dropTable('book_author');
+        $this->dropTable('{{%book_author}}');
     }
 }
