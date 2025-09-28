@@ -126,13 +126,7 @@ class SiteController extends Controller
         }
 
         $topAuthors = Author::find()
-            ->select([
-                '{{%authors}}.*',
-                'books_count' => 'COUNT(DISTINCT {{%books}}.id)'
-            ])
-            ->innerJoinWith('bookAuthorsRelation.bookRelation')
-            ->where(['{{%books}}.year' => $model->year])
-            ->groupBy('{{%authors}}.id')
+            ->topByYear($model->year)
             ->orderBy(['books_count' => SORT_DESC])
             ->limit(10)
             ->asArray()

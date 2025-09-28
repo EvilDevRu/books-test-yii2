@@ -29,6 +29,14 @@ class Author extends ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public static function find(): AuthorQuery
+    {
+        return new AuthorQuery(static::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function rules(): array
     {
         return [
