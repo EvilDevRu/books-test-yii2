@@ -1,5 +1,6 @@
 <?php
 
+use app\components\LocalFilesystem;
 use League\Tactician\CommandBus;
 use League\Tactician\Handler\CommandHandlerMiddleware;
 use League\Tactician\Handler\CommandNameExtractor\ClassNameExtractor;
@@ -52,6 +53,10 @@ $config = [
         'db' => $db,
         'authManager' => [
             'class' => \yii\rbac\DbManager::class,
+        ],
+        'fs' => [
+            'class' => LocalFilesystem::class,
+            'path' => '@app/storage',
         ],
     ],
     'container' => [

@@ -29,8 +29,8 @@ use yii\web\UploadedFile;
  */
 class Book extends ActiveRecord
 {
-    public $photoFile;
-    public $authors = [];
+    public UploadedFile|null $photoFile = null;
+    public array $authors = [];
 
     /**
      * {@inheritdoc}
@@ -89,24 +89,11 @@ class Book extends ActiveRecord
     public function upload(): bool
     {
         if ($this->photoFile) {
-            $fileName = Yii::$app->security->generateRandomString(12) . '.' . $this->photoFile->extension;
-            $filePath = Yii::getAlias('@webroot/uploads/books/') . $fileName;
-
-            // Создаем директорию если не существует
-            $dir = dirname($filePath);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            if ($this->photoFile->saveAs($filePath)) {
-                // Удаляем старое фото если оно есть
-                if ($this->photo && file_exists(Yii::getAlias('@webroot') . $this->photo)) {
-                    unlink(Yii::getAlias('@webroot') . $this->photo);
-                }
-
-                $this->photo = '/uploads/books/' . $fileName;
-                return true;
-            }
+            $fileName = \Yii::$app->security->generateRandomString(12) . '.' . $this->photoFile->extension;
+            $stream = fopen($this->photoFile->tempName, 'r+');
+            \Yii::$app->fs->writeStream($fileName, $stream);
+            $this->photo = $fileName;
+            return true;
         }
 
         return false;
@@ -148,19 +135,6 @@ class Book extends ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function afterDelete(): void
-    {
-        parent::afterDelete();
-
-        // Удаляем файл фото при удалении книги
-        if ($this->photo && file_exists(Yii::getAlias('@webroot') . $this->photo)) {
-            unlink(Yii::getAlias('@webroot') . $this->photo);
-        }
-    }
-
-    /**
      * Получает URL фото обложки
      * @return string
      */
@@ -171,7 +145,7 @@ class Book extends ActiveRecord
 
     /**
      * Получает абсолютный путь к фото
-     * @return string
+     * @return string|null
      */
     public function getPhotoPath(): ?string
     {

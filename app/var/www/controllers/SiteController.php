@@ -114,6 +114,7 @@ class SiteController extends Controller
      * Displays about page.
      *
      * @return string
+     * @throws \Exception
      */
     public function actionTop(): string
     {

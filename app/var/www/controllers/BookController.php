@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\bus\BookSaveAuthorsCommand;
+use app\bus\UploadFileCommand;
 use app\models\Author;
 use app\models\Book;
 use League\Tactician\CommandBus;
