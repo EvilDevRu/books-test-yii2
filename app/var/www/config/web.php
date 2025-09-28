@@ -63,6 +63,7 @@ $config = [
                 $locator = new ServiceLocator([
                     'components' => [
                         \app\bus\BookSaveAuthorsCommand::class => \app\bus\BookSaveAuthorsHandler::class,
+                        \app\bus\AuthorSubscribeCommand::class => \app\bus\AuthorSubscribeHandler::class,
                     ],
                 ]);
 
