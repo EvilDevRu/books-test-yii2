@@ -138,9 +138,9 @@ class Book extends ActiveRecord
      * Получает URL фото обложки
      * @return string
      */
-    public function getPhotoUrl(): string
+    public function getPhotoUrl(array $params = ['p' => 'small']): string
     {
-        return Yii::$app->request->baseUrl . $this->photo;
+        return Yii::$app->glide->makeImage($this->photo, $params);
     }
 
     /**

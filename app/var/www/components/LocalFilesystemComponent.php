@@ -8,7 +8,7 @@ use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 
-class LocalFilesystem extends Component
+class LocalFilesystemComponent extends Component
 {
     public $path;
     protected $filesystem;
@@ -27,11 +27,11 @@ class LocalFilesystem extends Component
             $this->path,
             PortableVisibilityConverter::fromArray([
                 'file' => [
-                    'public' => 0640,
+                    'public' => 0644,
                     'private' => 0604,
                 ],
                 'dir' => [
-                    'public' => 0740,
+                    'public' => 0744,
                     'private' => 7604,
                 ],
             ]),

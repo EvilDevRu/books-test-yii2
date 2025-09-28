@@ -1,6 +1,7 @@
 <?php
 
-use app\components\LocalFilesystem;
+use app\components\LocalFilesystemComponent;
+use League\Glide\ServerFactory;
 use League\Tactician\CommandBus;
 use League\Tactician\Handler\CommandHandlerMiddleware;
 use League\Tactician\Handler\CommandNameExtractor\ClassNameExtractor;
@@ -55,8 +56,14 @@ $config = [
             'class' => \yii\rbac\DbManager::class,
         ],
         'fs' => [
-            'class' => LocalFilesystem::class,
+            'class' => LocalFilesystemComponent::class,
             'path' => '@app/storage',
+        ],
+        'glide' => [
+            'class' => \app\components\GlideComponent::class,
+            'sourcePath' => '@app/storage',
+            'cachePath' => '@webroot/cache/images',
+            'baseUrl' => '/cache/images/',
         ],
     ],
     'container' => [
@@ -80,6 +87,45 @@ $config = [
                 );
 
                 return new CommandBus([$lockingMiddleware, $commandMiddleware]);
+            },
+
+            /**
+             * Glide
+             */
+            \League\Glide\Server::class => function () {
+                return ServerFactory::create([
+                    'source' => Yii::getAlias('@app/storage'),
+                    'cache' => Yii::getAlias('@webroot/cache/images'),
+
+                    'driver' => 'imagick',
+                    'max_image_size' => 2000 * 2000,
+                    'defaults' => [
+                        'q' => 80,
+                        'fm' => 'jpg',
+                    ],
+                    'presets' => [
+                        'small' => [
+                            'w' => 200,
+                            'h' => 200,
+                            'fit' => 'crop',
+                        ],
+                        'medium' => [
+                            'w' => 500,
+                            'h' => 500,
+                            'fit' => 'contain',
+                        ],
+                        'large' => [
+                            'w' => 800,
+                            'h' => 600,
+                            'fit' => 'max',
+                        ],
+                        'thumbnail' => [
+                            'w' => 100,
+                            'h' => 100,
+                            'fit' => 'crop',
+                        ],
+                    ],
+                ]);
             },
         ],
     ],
